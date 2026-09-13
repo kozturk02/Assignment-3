@@ -52,3 +52,7 @@ export function logout() {
     method: 'POST',
   });
 }
+
+export function getHealth() {
+  return request('/api/health');
+}
