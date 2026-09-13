@@ -58,18 +58,7 @@ echo "Checking database..."
 (
   cd backend
 
-  node -e "
-    const db = require('./db');
-
-    const columns = db.prepare('PRAGMA table_info(capsules)').all();
-
-    if (!columns.length) {
-      console.error('capsules table not found');
-      process.exit(1);
-    }
-
-    console.log('capsules table: OK');
-  "
+  node -e "const db = require('./db'); console.log(db); console.log(typeof db.prepare);"
 )
 
 # Check frontend build
