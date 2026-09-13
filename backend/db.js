@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const db = new Database('capsules.db');
 
 db.exec(`
-CREATE TABLE capsules (
+CREATE TABLE IF NOT EXISTS capsules (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  user_id TEXT NOT NULL,
  project_name TEXT NOT NULL,
