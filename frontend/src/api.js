@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001/api';
+const BASE_URL = 'http://localhost:3001';
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -44,7 +44,7 @@ export function deleteCapsule(id) {
 }
 
 export function loginWithGitHub() {
-  window.location.href = `${API_URL}/login`;
+  window.location.href = `${BASE_URL}/login`;
 }
 
 export function logout() {

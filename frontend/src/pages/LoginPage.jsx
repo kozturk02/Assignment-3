@@ -11,7 +11,7 @@ function LoginPage({ loggedIn, handleSignOut, loginWithGitHub, openDashboard }) 
   return (
     <main>
       <section className="header">
-        <span className="header-title">AI Capsule</span>
+        <Link to="/" className="header-title">AI Capsule</Link>
         <span className="login-title">
           <button className="header-button" onClick={loggedIn ? handleSignOut : refreshPage}>
             {loginStatus}
