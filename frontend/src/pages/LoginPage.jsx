@@ -1,4 +1,4 @@
-function LoginPage({ loggedIn, handleSignOut, handleSignIn, openDashboard }) {
+function LoginPage({ loggedIn, handleSignOut, loginWithGitHub, openDashboard }) {
   let loginStatus = (loggedIn ? "Sign out" : "Sign in");
   let loginTitle = (loggedIn ? "Already logged in" : "Sign in to AI Capsule");
   let loginText = (loggedIn ? "You're already signed in to your AI Capsule account." : "Use GitHub to access your private prompt library.");
@@ -25,7 +25,7 @@ function LoginPage({ loggedIn, handleSignOut, handleSignIn, openDashboard }) {
           <h1>{loginTitle}</h1>
           <p className="login-text">{loginText}</p>
 
-          <button className="main-button login-button" onClick={loggedIn ? openDashboard : handleSignIn}>
+          <button className="main-button login-button" onClick={loggedIn ? openDashboard : loginWithGitHub}>
             {loginButton}
           </button>
 

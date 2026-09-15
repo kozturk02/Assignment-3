@@ -33,7 +33,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage loggedIn={loggedIn} openLoginPage={openLoginPage} openDashboard={openDashboard} handleSignOut={handleSignOut} />} />
-      <Route path="/login" element={loggedIn ? <Navigate to="/dashboard" /> : <LoginPage onSignIn={loginWithGitHub} />} />
+      <Route path="/login" element={loggedIn ? <Navigate to="/dashboard" /> : <LoginPage loggedIn={loggedIn} loginWithGitHub={loginWithGitHub} handleSignOut={handleSignOut} openDashboard={openDashboard} />} />
       <Route path="/dashboard" element={loggedIn ? <DashboardPage handleSignOut={handleSignOut} /> : <Navigate to="/login" />} />
     </Routes>
   );
