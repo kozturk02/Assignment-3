@@ -11,7 +11,7 @@ function requireAuth(req, res, next) {
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+    const user = jwt.verify(token, process.env.SESSION_SECRET);
     req.user = user;
     next();
   } catch (err) {
@@ -27,7 +27,7 @@ router.get('/login', (req, res) => {
   const url =
     `https://github.com/login/oauth/authorize` +
     `?client_id=${process.env.GITHUB_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_CALLBACK)}`;
+    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_FALLBACK)}`;
 
   res.redirect(url);
 });
@@ -50,7 +50,7 @@ router.get('/auth/github/callback', async (req, res) => {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
-        redirect_uri: process.env.GITHUB_CALLBACK,
+        redirect_uri: process.env.GITHUB_FALLBACK,
       }),
     });
 
@@ -74,7 +74,7 @@ router.get('/auth/github/callback', async (req, res) => {
         userId: String(githubUser.id),
         username: githubUser.login,
       },
-      process.env.JWT_SECRET,
+      process.env.SESSION_SECRET,
       { expiresIn: '2h' }
     );
 
