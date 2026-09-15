@@ -24,7 +24,11 @@ router.get('/api/auth/me', requireAuth, (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  const url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}`;
+  const url =
+    `https://github.com/login/oauth/authorize` +
+    `?client_id=${process.env.GITHUB_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_CALLBACK_URL)}`;
+
   res.redirect(url);
 });
 
@@ -46,6 +50,7 @@ router.get('/auth/github/callback', async (req, res) => {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
+        redirect_uri: process.env.GITHUB_CALLBACK_URL,
       }),
     });
 
