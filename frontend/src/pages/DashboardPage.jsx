@@ -45,8 +45,6 @@ function DashboardPage() {
 
   return (
     <main>
-      <h1>Dashboard</h1>
-
       <CapsuleForm
         capsule={editing}
         onSave={handleSave}

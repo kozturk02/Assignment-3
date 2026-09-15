@@ -14,7 +14,6 @@ echo "  http://localhost:5173"
 echo
 echo "The frontend calls the backend directly at:"
 echo "  http://localhost:3001"
-echo "(via the cors package on Express, not a Vite proxy)"
 echo
 echo "Press Ctrl + C to stop the frontend."
 echo

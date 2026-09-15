@@ -56,3 +56,7 @@ export function logout() {
 export function getHealth() {
   return request('/api/health');
 }
+
+export function checkLogin() {
+  return request('/api/auth/me');
+}

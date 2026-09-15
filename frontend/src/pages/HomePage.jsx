@@ -1,11 +1,43 @@
-import { Link } from 'react-router-dom';
+function HomePage({ loggedIn, openLoginPage, openDashboard, handleSignOut }) {
+  let loginStatus = (loggedIn ? "Sign out" : "Sign in");
+  let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
 
-function HomePage() {
   return (
     <main>
-      <h1>AI Capsule</h1>
-      <p>Save and manage useful AI prompts.</p>
-      <Link to="/login">Login</Link>
+      <section className="header">
+        <span className="header-title">AI Capsule</span>
+        <span className="login-title">
+          <button className="header-button" onClick={loggedIn ? handleSignOut : openLoginPage}>
+            {loginStatus}
+          </button>
+        </span>
+      </section>
+
+      <section className="home">
+        <h1>Your AI prompts, in one place.</h1>
+        <p>Save, review and improve the prompts you want to keep.</p>
+
+        <button className="main-button" onClick={loggedIn ? openDashboard : openLoginPage}>
+          {loginButton}
+        </button>
+      </section>
+
+      <section className="features">
+        <div className="feature">
+          <h2>Save prompts</h2>
+          <p>Keep your best ideas organised and easy to find.</p>
+        </div>
+
+        <div className="feature">
+          <h2>Track versions</h2>
+          <p>See how your prompts evolve over time.</p>
+        </div>
+
+        <div className="feature">
+          <h2>Review what works</h2>
+          <p>Learn from past results and make them better.</p>
+        </div>
+      </section>
     </main>
   );
 }
