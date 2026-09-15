@@ -33,7 +33,7 @@ function DashboardPage({ handleSignOut, user }) {
 
         <span className="login-title">
           <button className="header-button" onClick={handleSignOut}>Sign out</button>
-          {user?.avatarUrl && <img className="github-avatar" src={user.avatarUrl} alt="GitHub profile" />}
+          {user?.avatarUrl && <img className="github-avatar" src={user.avatarUrl} alt="avatar" />}
         </span>
       </section>
 

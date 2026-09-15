@@ -12,10 +12,7 @@ function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOu
           <button className="header-button" onClick={loggedIn ? handleSignOut : loginWithGitHub}>
             {loginStatus}
           </button>
-
-          {loggedIn && user?.avatarUrl && (
-            <img className="github-avatar" src={user.avatarUrl} alt="GitHub profile" />
-          )}
+          {user?.avatarUrl && <img className="github-avatar" src={user.avatarUrl} alt="avatar" />}
         </span>
       </section>
 

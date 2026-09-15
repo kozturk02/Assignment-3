@@ -39,6 +39,7 @@ function App() {
       <Route path="/" element={
         <HomePage
           loggedIn={loggedIn}
+          user={user}
           loginWithGitHub={loginWithGitHub}
           openDashboard={openDashboard}
           handleSignOut={handleSignOut}
