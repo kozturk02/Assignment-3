@@ -168,6 +168,13 @@ main {
   font-size: 13px;
 }
 
+.header-title {
+  color: #1d1d1f;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 650;
+}
+
 /* Mobile */
 
 @media (max-width: 750px) {

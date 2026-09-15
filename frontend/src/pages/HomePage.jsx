@@ -2,16 +2,12 @@ function HomePage({ loggedIn, openLoginPage, openDashboard, handleSignOut }) {
   let loginStatus = (loggedIn ? "Sign out" : "Sign in");
   let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
 
-  function refreshPage() {
-    window.location.reload();
-  }
-
   return (
     <main>
       <section className="header">
-        <button className="header-button" onClick={refreshPage}>
-            AI Capsule
-        </button>
+        <Link to="/" className="header-title">
+          AI Capsule
+        </Link>
         <span className="login-title">
           <button className="header-button" onClick={loggedIn ? handleSignOut : openLoginPage}>
             {loginStatus}

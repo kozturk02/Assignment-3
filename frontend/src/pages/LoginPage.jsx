@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function LoginPage({ loggedIn, handleSignOut, loginWithGitHub, openDashboard }) {
   let loginStatus = (loggedIn ? "Sign out" : "Sign in");
   let loginTitle = (loggedIn ? "Already logged in" : "Sign in to AI Capsule");
