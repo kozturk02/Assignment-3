@@ -20,10 +20,7 @@ function requireAuth(req, res, next) {
 }
 
 router.get('/api/auth/me', requireAuth, (req, res) => {
-  res.json({
-    loggedIn: true,
-    user: req.user
-  });
+  res.json({ loggedIn: true, user: req.user });
 });
 
 router.get('/login', (req, res) => {

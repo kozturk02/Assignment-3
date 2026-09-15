@@ -46,7 +46,7 @@ function App() {
       } />
       <Route path="/dashboard" element={
         loggedIn
-          ? <DashboardPage handleSignOut={handleSignOut} />
+          ? <DashboardPage handleSignOut={handleSignOut} user={user} />
           : <Navigate to="/" replace />
       } />
     </Routes>
