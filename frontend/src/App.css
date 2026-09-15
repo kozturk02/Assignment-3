@@ -2,7 +2,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   min-height: 100%;
 }
@@ -16,6 +18,11 @@ body {
 button {
   font: inherit;
   cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 main {
@@ -35,6 +42,8 @@ main {
 }
 
 .header-title {
+  color: #1d1d1f;
+  text-decoration: none;
   font-size: 22px;
   font-weight: 650;
 }
@@ -42,6 +51,7 @@ main {
 .login-title {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .header-button {
@@ -54,6 +64,13 @@ main {
 
 .header-button:hover {
   color: #6e6e73;
+}
+
+.github-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* Home Page */
@@ -120,59 +137,142 @@ main {
   line-height: 1.5;
 }
 
-/* Login Page */
+/* Dashboard */
 
-.login {
-  min-height: calc(100vh - 76px);
-  padding: 40px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.dashboard {
+  width: min(1180px, 88%);
+  margin: 0 auto;
+  padding: 70px 0 100px;
 }
 
-.login-card {
-  width: min(520px, 100%);
-  padding: 50px;
+.dashboard-heading {
+  margin-bottom: 36px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.dashboard-heading h1 {
+  margin: 0;
+  font-size: 42px;
+  letter-spacing: -1.5px;
+}
+
+.dashboard-heading p {
+  margin: 10px 0 0;
+  color: #6e6e73;
+  font-size: 17px;
+}
+
+.capsules {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.capsule {
+  padding: 30px;
   border: 1px solid #e5e5e7;
   border-radius: 18px;
-  text-align: center;
   background: #fff;
 }
 
-.login-welcome {
-  margin: 0 0 10px;
-  color: #86868b;
-  font-size: 15px;
+.capsule-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.login-card h1 {
+.capsule-heading h2 {
   margin: 0;
-  font-size: 36px;
-  letter-spacing: -1px;
+  font-size: 22px;
 }
 
-.login-text {
-  margin: 14px 0 34px;
-  color: #6e6e73;
-  font-size: 17px;
+.capsule-heading p {
+  margin: 7px 0 0;
+  color: #86868b;
+  font-size: 14px;
+}
+
+.capsule-content {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+}
+
+.capsule-section p {
+  margin: 8px 0 0;
+  color: #333336;
   line-height: 1.5;
 }
 
-.login-button {
-  width: 100%;
-}
-
-.login-security {
-  margin: 25px 0 0;
+.capsule-label {
   color: #86868b;
   font-size: 13px;
 }
 
-.header-title {
+.capsule-status {
+  margin-top: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.capsule-status span {
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: #f5f5f7;
+  color: #515154;
+  font-size: 12px;
+}
+
+.capsule-footer {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #eeeeef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: #86868b;
+  font-size: 13px;
+}
+
+.capsule-actions {
+  display: flex;
+  gap: 18px;
+}
+
+.capsule-actions button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #515154;
+  font-size: 14px;
+}
+
+.capsule-actions button:hover {
   color: #1d1d1f;
-  text-decoration: none;
+}
+
+.empty-capsules {
+  padding: 70px 30px;
+  border: 1px solid #e5e5e7;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.empty-capsules h2 {
+  margin: 0;
   font-size: 22px;
-  font-weight: 650;
+}
+
+.empty-capsules p {
+  margin: 10px 0 0;
+  color: #86868b;
 }
 
 /* Mobile */
@@ -194,11 +294,27 @@ main {
     grid-template-columns: 1fr;
   }
 
-  .login-card {
-    padding: 35px 25px;
+  .dashboard {
+    width: min(92%, 1180px);
+    padding-top: 45px;
   }
 
-  .login-card h1 {
-    font-size: 30px;
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-heading h1 {
+    font-size: 34px;
+  }
+
+  .capsule-content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .capsule-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

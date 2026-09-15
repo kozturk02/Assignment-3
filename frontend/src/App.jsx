@@ -7,11 +7,18 @@ import './App.css';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     checkLogin()
-      .then(() => setLoggedIn(true))
-      .catch(() => setLoggedIn(false));
+      .then(data => {
+        setLoggedIn(true);
+        setUser(data.user);
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setUser(null);
+      });
   }, []);
 
   function openDashboard() {
@@ -21,6 +28,7 @@ function App() {
   async function handleSignOut() {
     await logout();
     setLoggedIn(false);
+    setUser(null);
     window.location.href = '/';
   }
 

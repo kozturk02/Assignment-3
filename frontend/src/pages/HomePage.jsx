@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-function HomePage({ loggedIn, loginWithGitHub, openDashboard, handleSignOut }) {
+function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOut }) {
   let loginStatus = (loggedIn ? "Sign out" : "Sign in");
   let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
 
@@ -12,6 +12,10 @@ function HomePage({ loggedIn, loginWithGitHub, openDashboard, handleSignOut }) {
           <button className="header-button" onClick={loggedIn ? handleSignOut : loginWithGitHub}>
             {loginStatus}
           </button>
+
+          {loggedIn && user?.avatarUrl && (
+            <img className="github-avatar" src={user.avatarUrl} alt="GitHub profile" />
+          )}
         </span>
       </section>
 

@@ -20,7 +20,10 @@ function requireAuth(req, res, next) {
 }
 
 router.get('/api/auth/me', requireAuth, (req, res) => {
-  res.json({ loggedIn: true });
+  res.json({
+    loggedIn: true,
+    user: req.user
+  });
 });
 
 router.get('/login', (req, res) => {
@@ -73,6 +76,7 @@ router.get('/auth/github/callback', async (req, res) => {
       {
         userId: String(githubUser.id),
         username: githubUser.login,
+        avatarUrl: githubUser.avatar_url,
       },
       process.env.SESSION_SECRET,
       { expiresIn: '2h' }
