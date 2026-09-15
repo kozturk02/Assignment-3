@@ -19,10 +19,12 @@ function requireAuth(req, res, next) {
   }
 }
 
-router.get('/login', (req, res) => {
-  const url =
-    `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}`;
+router.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({ loggedIn: true });
+});
 
+router.get('/login', (req, res) => {
+  const url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}`;
   res.redirect(url);
 });
 
@@ -30,30 +32,27 @@ router.get('/auth/github/callback', async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
-    return res.status(400).json({ error: 'GitHub login failed' });
+    return res.redirect(`${process.env.FRONTEND_URL}/`);
   }
 
   try {
-    const tokenResponse = await fetch(
-      'https://github.com/login/oauth/access_token',
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
-          code,
-        }),
-      }
-    );
+    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code,
+      }),
+    });
 
     const tokenData = await tokenResponse.json();
 
     if (!tokenData.access_token) {
-      return res.status(401).json({ error: 'GitHub authentication failed' });
+      return res.redirect(`${process.env.FRONTEND_URL}/`);
     }
 
     const userResponse = await fetch('https://api.github.com/user', {
@@ -84,12 +83,17 @@ router.get('/auth/github/callback', async (req, res) => {
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Authentication failed' });
+    res.redirect(`${process.env.FRONTEND_URL}/`);
   }
 });
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+
   res.json({ loggedOut: true });
 });
 

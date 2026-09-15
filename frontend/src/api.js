@@ -13,7 +13,7 @@ async function request(path, options = {}) {
   const data = res.status === 204 ? null : await res.json();
 
   if (!res.ok) {
-    throw new Error(`${data?.error || 'Unknown error'}`);
+    throw new Error(data?.error || 'Unknown error');
   }
 
   return data;
