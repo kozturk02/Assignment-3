@@ -1,21 +1,16 @@
 import { Link } from 'react-router-dom';
 
 function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOut }) {
-  let loginStatus = (loggedIn ? "Sign out" : "Sign in");
   let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
 
   return (
     <main>
-      <section className="header">
-        <Link to="/" className="header-title">AI Capsule</Link>
-        <span className="login-title">
-          <button className="header-button" onClick={loggedIn ? handleSignOut : loginWithGitHub}>
-            {loginStatus}
-          </button>
-          {user?.avatarUrl && <img className="github-avatar" src={user.avatarUrl} alt="avatar" />}
-        </span>
-      </section>
-
+        <HeaderPanel
+          loggedIn={loggedIn}
+          user={user}
+          loginWithGitHub={loginWithGitHub}
+          handleSignOut={handleSignOut}
+        />
       <section className="home">
         <h1>Your AI prompts, in one place.</h1>
         <p>Save, review and improve the prompts you want to keep.</p>
