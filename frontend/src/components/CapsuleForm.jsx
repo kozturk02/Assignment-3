@@ -90,7 +90,7 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
         <div className="form-row three">
           <label>Project name<input name="project_name" value={form.project_name} onChange={handleChange} required /></label>
           <label>Prompt title<input name="prompt_title" value={form.prompt_title} onChange={handleChange} required /></label>
-          <label>Prompt version<input name="prompt_version" value={form.prompt_version} onChange={handleChange} placeholder="v1" /></label>
+          <label>Prompt version<input name="prompt_version" value={form.prompt_version} onChange={handleChange} /></label>
         </div>
 
         <div className="form-row">
@@ -101,12 +101,11 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
             </select>
           </label>
 
-          <label>Custom category
+          <label>
             <input
               value={customCategory}
               onChange={e => setCustomCategory(e.target.value)}
               disabled={form.category !== 'Custom'}
-              placeholder="Enter custom category"
               required={form.category === 'Custom'}
             />
           </label>

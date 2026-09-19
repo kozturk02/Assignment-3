@@ -1,4 +1,5 @@
 import HeaderPanel from '../components/HeaderPanel';
+import { GitHubIcon } from '../components/Icons';
 
 function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOut }) {
   let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
@@ -16,8 +17,12 @@ function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOu
         <h1>Your AI prompts, in one place.</h1>
         <p>Save, review and improve the prompts you want to keep.</p>
 
-        <button className="main-button" onClick={loggedIn ? openDashboard : loginWithGitHub}>
-          {loginButton}
+        <button
+          className={`main-button ${!loggedIn ? 'github-main-button' : ''}`}
+          onClick={loggedIn ? openDashboard : loginWithGitHub}
+        >
+          {!loggedIn && <GitHubIcon className="github-icon" />}
+          {loggedIn ? 'Continue to Dashboard' : 'Sign in with GitHub'}
         </button>
       </section>
 

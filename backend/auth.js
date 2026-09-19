@@ -27,7 +27,8 @@ router.get('/login', (req, res) => {
   const url =
     `https://github.com/login/oauth/authorize` +
     `?client_id=${process.env.GITHUB_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_FALLBACK)}`;
+    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_FALLBACK)}` +
+    `&prompt=select_account`;
 
   res.redirect(url);
 });

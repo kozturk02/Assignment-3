@@ -1,4 +1,7 @@
-const BASE_URL = 'http://localhost:3001';
+const PORT = process.env.PORT || process.env.BACKEND_PORT || 3001;
+const HOST = process.env.HOST_ADDRESS || 'localhost';
+const FRONTEND_PORT = process.env.FRONTEND_PORT || 5173;
+const FRONTEND_URL = `http://${HOST}:${FRONTEND_PORT}`;
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {

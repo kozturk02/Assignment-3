@@ -276,10 +276,17 @@ main {
   color: #1d1d1f;
 }
 
-.capsule-actions .delete-button,
+.capsule-actions .delete-button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #ff3b30;
+  color: white;
+  font-weight: 600;
+}
+
 .capsule-actions .delete-button:hover {
-  color: #d70015;
-  font-weight: bold;
+  background: #e5342b;
 }
 
 .empty-capsules {
@@ -515,72 +522,13 @@ main {
   cursor: default;
 }
 
+.github-main-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
 
-/* Mobile */
-
-@media (max-width: 750px) {
-  .header {
-    padding: 0 24px;
-  }
-
-  .home {
-    padding: 80px 20px 60px;
-  }
-
-  .home h1 {
-    font-size: 42px;
-  }
-
-  .features {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard {
-    width: min(92%, 1180px);
-    padding-top: 45px;
-  }
-
-  .dashboard-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .dashboard-heading h1 {
-    font-size: 34px;
-  }
-
-  .capsule-main,
-  .form-row,
-  .form-row.three {
-    grid-template-columns: 1fr;
-  }
-
-  .capsule-left {
-    padding-right: 0;
-    padding-bottom: 20px;
-    border-right: none;
-    border-bottom: 1px solid #eeeeef;
-  }
-
-  .capsule-facts {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .capsule-footer {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .capsule-form {
-    padding: 24px 20px;
-  }
-
-  .screenshot-add {
-    grid-template-columns: 1fr;
-  }
-
-  .screenshot-add .upload-button,
-  .add-button {
-    width: 100%;
-  }
+.github-icon {
+  width: 22px;
+  height: 22px;
 }
