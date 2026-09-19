@@ -30,6 +30,7 @@ main {
   background: #fff;
 }
 
+
 /* Header */
 
 .header {
@@ -43,7 +44,6 @@ main {
 
 .header-title {
   color: #1d1d1f;
-  text-decoration: none;
   font-size: 22px;
   font-weight: 650;
 }
@@ -73,7 +73,8 @@ main {
   object-fit: cover;
 }
 
-/* Home Page */
+
+/* Home */
 
 .home {
   text-align: center;
@@ -107,6 +108,7 @@ main {
   background: #333336;
 }
 
+
 /* Home Features */
 
 .features {
@@ -135,6 +137,7 @@ main {
   line-height: 1.5;
 }
 
+
 /* Dashboard */
 
 .dashboard {
@@ -148,6 +151,7 @@ main {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  gap: 30px;
 }
 
 .dashboard-heading h1 {
@@ -159,7 +163,11 @@ main {
 .dashboard-heading p {
   margin: 8px 0 0;
   color: #6e6e73;
+  font-size: 16px;
 }
+
+
+/* History */
 
 .capsules {
   display: flex;
@@ -168,7 +176,7 @@ main {
 }
 
 .capsule {
-  padding: 24px;
+  padding: 24px 26px 18px;
   border: 1px solid #e5e5e7;
   border-radius: 14px;
   background: #fff;
@@ -203,6 +211,7 @@ main {
 .capsule-section p,
 .capsule-facts p {
   margin: 5px 0 0;
+  color: #333336;
   line-height: 1.45;
 }
 
@@ -219,14 +228,23 @@ main {
   border-bottom: 1px solid #eeeeef;
 }
 
-.history-stars span,
-.star-rating button {
-  color: #d2d2d7;
+.history-stars {
+  white-space: nowrap;
 }
 
-.history-stars .selected,
-.star-rating .selected {
+.history-stars span {
+  color: #d2d2d7;
+  font-size: 18px;
+}
+
+.history-stars .selected {
   color: #f5b301;
+}
+
+.capsule-section a {
+  color: #1d1d1f;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .capsule-footer {
@@ -234,7 +252,9 @@ main {
   padding-top: 15px;
   border-top: 1px solid #eeeeef;
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 20px;
   color: #86868b;
   font-size: 13px;
 }
@@ -249,31 +269,58 @@ main {
   border: none;
   background: none;
   color: #515154;
+  font-size: 14px;
 }
 
-.capsule-actions .delete-button {
+.capsule-actions button:hover {
+  color: #1d1d1f;
+}
+
+.capsule-actions .delete-button,
+.capsule-actions .delete-button:hover {
   color: #d70015;
   font-weight: bold;
 }
+
+.empty-capsules {
+  padding: 70px 30px;
+  border: 1px solid #e5e5e7;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.empty-capsules h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.empty-capsules p {
+  margin: 10px 0 0;
+  color: #86868b;
+}
+
+
+/* Capsule Form */
 
 .form-backdrop {
   position: fixed;
   inset: 0;
   z-index: 20;
+  padding: 30px 20px;
   display: grid;
   place-items: center;
-  padding: 30px;
+  overflow-y: auto;
   background: rgba(30, 36, 48, 0.55);
   backdrop-filter: blur(2px);
 }
 
 .capsule-form {
-  width: min(700px, 100%);
+  width: min(720px, 100%);
   max-height: 92vh;
   overflow-y: auto;
   padding: 30px;
   border-radius: 16px;
-  background: white;
+  background: #fff;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
 }
 
@@ -309,10 +356,13 @@ main {
 .capsule-form input,
 .capsule-form select,
 .capsule-form textarea {
+  width: 100%;
   padding: 10px 12px;
   border: 1px solid #d2d2d7;
   border-radius: 8px;
-  background: white;
+  outline: none;
+  background: #fff;
+  color: #1d1d1f;
   font: inherit;
 }
 
@@ -320,6 +370,21 @@ main {
   min-height: 75px;
   resize: vertical;
 }
+
+.capsule-form input:focus,
+.capsule-form select:focus,
+.capsule-form textarea:focus {
+  border-color: #86868b;
+}
+
+.capsule-form input:disabled {
+  background: #f5f5f7;
+  color: #a1a1a6;
+  cursor: not-allowed;
+}
+
+
+/* Stars */
 
 .star-rating {
   height: 40px;
@@ -331,8 +396,93 @@ main {
   padding: 0 2px;
   border: none;
   background: none;
+  color: #d2d2d7;
   font-size: 25px;
+  line-height: 1;
 }
+
+.star-rating button:hover,
+.star-rating .selected {
+  color: #f5b301;
+}
+
+
+/* Screenshots */
+
+.screenshot-add {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  margin-top: 6px;
+  align-items: center;
+}
+
+.screenshot-add .upload-button {
+  width: auto;
+  height: 39px;
+  margin: 0;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d1d1f;
+  cursor: pointer;
+}
+
+.screenshot-add .upload-button:hover {
+  background: #f5f5f7;
+}
+
+.add-button {
+  height: 39px;
+  padding: 0 18px;
+  border: 1px solid #1d1d1f;
+  border-radius: 8px;
+  background: #1d1d1f;
+  color: #fff;
+}
+
+.add-button:hover {
+  background: #333336;
+}
+
+.selected-upload,
+.screenshot-item {
+  min-height: 39px;
+  margin-top: 8px;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border: 1px solid #eeeeef;
+  border-radius: 8px;
+  color: #515154;
+  font-size: 13px;
+}
+
+.screenshot-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-upload button,
+.screenshot-item button {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #d70015;
+  font-weight: bold;
+}
+
+
+/* Form Buttons */
 
 .form-actions {
   margin-top: 24px;
@@ -343,21 +493,62 @@ main {
   gap: 10px;
 }
 
+.form-actions .main-button {
+  padding: 10px 18px;
+  border-radius: 9px;
+}
+
 .secondary-button {
   padding: 10px 18px;
   border: 1px solid #d2d2d7;
   border-radius: 9px;
-  background: white;
+  background: #fff;
+  color: #1d1d1f;
 }
 
-.empty-capsules {
-  padding: 70px;
-  border: 1px solid #e5e5e7;
-  border-radius: 14px;
-  text-align: center;
+.secondary-button:hover {
+  background: #f5f5f7;
 }
+
+.form-actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+
+/* Mobile */
 
 @media (max-width: 750px) {
+  .header {
+    padding: 0 24px;
+  }
+
+  .home {
+    padding: 80px 20px 60px;
+  }
+
+  .home h1 {
+    font-size: 42px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard {
+    width: min(92%, 1180px);
+    padding-top: 45px;
+  }
+
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-heading h1 {
+    font-size: 34px;
+  }
+
   .capsule-main,
   .form-row,
   .form-row.three {
@@ -373,5 +564,23 @@ main {
 
   .capsule-facts {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .capsule-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .capsule-form {
+    padding: 24px 20px;
+  }
+
+  .screenshot-add {
+    grid-template-columns: 1fr;
+  }
+
+  .screenshot-add .upload-button,
+  .add-button {
+    width: 100%;
   }
 }

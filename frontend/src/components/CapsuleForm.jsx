@@ -7,6 +7,12 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
   const editing = !!capsule;
   const isCustom = capsule?.category && !categories.includes(capsule.category);
 
+  function getScreenshots(value) {
+    if (!value) return [];
+    try { return JSON.parse(value); }
+    catch { return [value]; }
+  }
+
   const [form, setForm] = useState({
     project_name: capsule?.project_name || '',
     prompt_title: capsule?.prompt_title || '',
@@ -17,11 +23,13 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
     usefulness: capsule?.usefulness || '',
     reviewed: Number(capsule?.reviewed || 0),
     improved: Number(capsule?.improved || 0),
-    notes: capsule?.notes || '',
-    screenshot_url: capsule?.screenshot_url || ''
+    notes: capsule?.notes || ''
   });
 
   const [customCategory, setCustomCategory] = useState(isCustom ? capsule.category : '');
+  const [screenshots, setScreenshots] = useState(getScreenshots(capsule?.screenshot_url));
+  const [screenshotText, setScreenshotText] = useState('');
+  const [screenshotUpload, setScreenshotUpload] = useState('');
   const [saving, setSaving] = useState(false);
 
   function handleChange(e) {
@@ -30,11 +38,24 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
 
   function handleUpload(e) {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) return setScreenshotUpload('');
 
     const reader = new FileReader();
-    reader.onload = () => setForm({ ...form, screenshot_url: reader.result });
+    reader.onload = () => setScreenshotUpload(reader.result);
     reader.readAsDataURL(file);
+  }
+
+  function addScreenshot() {
+    const screenshot = screenshotUpload || screenshotText.trim();
+    if (!screenshot) return;
+
+    setScreenshots([...screenshots, screenshot]);
+    setScreenshotText('');
+    setScreenshotUpload('');
+  }
+
+  function deleteScreenshot(index) {
+    setScreenshots(screenshots.filter((_, i) => i !== index));
   }
 
   async function handleSubmit(e) {
@@ -46,7 +67,8 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
         ...form,
         category: form.category === 'Custom' ? customCategory : form.category,
         reviewed: Number(form.reviewed),
-        improved: Number(form.improved)
+        improved: Number(form.improved),
+        screenshot_url: screenshots.length ? JSON.stringify(screenshots) : ''
       };
 
       editing ? await updateCapsule(capsule.id, data) : await createCapsule(data);
@@ -79,19 +101,26 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
             </select>
           </label>
 
-          {form.category === 'Custom' &&
-            <label>Custom category<input value={customCategory} onChange={e => setCustomCategory(e.target.value)} required /></label>
-          }
+          <label>Custom category
+            <input
+              value={customCategory}
+              onChange={e => setCustomCategory(e.target.value)}
+              disabled={form.category !== 'Custom'}
+              placeholder="Enter custom category"
+              required={form.category === 'Custom'}
+            />
+          </label>
         </div>
 
         <label>Prompt text<textarea name="prompt_text" value={form.prompt_text} onChange={handleChange} required /></label>
         <label>Response summary<textarea name="response_summary" value={form.response_summary} onChange={handleChange} /></label>
 
         <div className="form-row three">
-          <label>Rating
+          <label>Usefulness Rating
             <div className="star-rating">
               {[1, 2, 3, 4, 5].map(star =>
-                <button type="button" key={star} className={star <= Number(form.usefulness) ? 'selected' : ''}
+                <button type="button" key={star}
+                  className={star <= Number(form.usefulness) ? 'selected' : ''}
                   onClick={() => setForm({ ...form, usefulness: String(star) })}>★</button>
               )}
             </div>
@@ -116,14 +145,39 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
           <textarea name="notes" value={form.notes} onChange={handleChange} />
         </label>
 
-        <label>Screenshot link (optional)
-          <input name="screenshot_url" value={form.screenshot_url.startsWith('data:') ? '' : form.screenshot_url}
-            onChange={handleChange} placeholder="https://..." />
-        </label>
+        <label>Screenshot evidence (optional)</label>
 
-        <label>Or upload screenshot
-          <input type="file" accept="image/*" onChange={handleUpload} />
-        </label>
+        <div className="screenshot-add">
+          <input
+            value={screenshotText}
+            onChange={e => setScreenshotText(e.target.value)}
+            placeholder={screenshotUpload ? 'Image selected' : 'Paste screenshot URL'}
+            disabled={!!screenshotUpload}
+          />
+
+          <label className="upload-button">
+            Upload
+            <input type="file" accept="image/*" onChange={handleUpload} hidden />
+          </label>
+
+          <button type="button" className="add-button" onClick={addScreenshot}>Add</button>
+        </div>
+
+        {screenshotUpload &&
+          <div className="selected-upload">
+            Image selected
+            <button type="button" onClick={() => setScreenshotUpload('')}>Delete</button>
+          </div>
+        }
+
+        <div className="screenshot-list">
+          {screenshots.map((screenshot, index) =>
+            <div className="screenshot-item" key={index}>
+              <span>{screenshot.startsWith('data:') ? `Uploaded image ${index + 1}` : screenshot}</span>
+              <button type="button" onClick={() => deleteScreenshot(index)}>Delete</button>
+            </div>
+          )}
+        </div>
 
         <div className="form-actions">
           <button type="button" className="secondary-button" onClick={onClose}>Cancel</button>
