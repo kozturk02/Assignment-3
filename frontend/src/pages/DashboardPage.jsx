@@ -3,7 +3,7 @@ import HistoryPanel from '../components/HistoryPanel';
 import { useEffect, useState } from 'react';
 import { getCapsules, deleteCapsule } from '../api';
 
-function DashboardPage({ handleSignOut, user }) {
+function DashboardPage({ loggedIn, user, loginWithGitHub, handleSignOut }) {
   const [capsules, setCapsules] = useState([]);
 
   async function loadCapsules() {

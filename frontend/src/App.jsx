@@ -47,7 +47,12 @@ function App() {
       } />
       <Route path="/dashboard" element={
         loggedIn
-          ? <DashboardPage handleSignOut={handleSignOut} user={user} />
+          ? <DashboardPage 
+            loggedIn={loggedIn}
+            user={user}
+            loginWithGitHub={loginWithGitHub}
+            handleSignOut={handleSignOut}
+          />
           : <Navigate to="/" replace />
       } />
     </Routes>
