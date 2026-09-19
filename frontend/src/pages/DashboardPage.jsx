@@ -29,14 +29,12 @@ function DashboardPage({ loggedIn, user, loginWithGitHub, handleSignOut }) {
 
   return (
     <main>
-      <section className="header">
-        <HeaderPanel
-          loggedIn={loggedIn}
-          user={user}
-          loginWithGitHub={loginWithGitHub}
-          handleSignOut={handleSignOut}
-        />
-      </section>
+      <HeaderPanel
+        loggedIn={loggedIn}
+        user={user}
+        loginWithGitHub={loginWithGitHub}
+        handleSignOut={handleSignOut}
+      />
 
       <section className="dashboard">
         <div className="dashboard-heading">

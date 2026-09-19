@@ -5,14 +5,12 @@ function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOu
 
   return (
     <main>
-      <section className="header">
-        <HeaderPanel
-          loggedIn={loggedIn}
-          user={user}
-          loginWithGitHub={loginWithGitHub}
-          handleSignOut={handleSignOut}
-        />
-      </section>
+      <HeaderPanel
+        loggedIn={loggedIn}
+        user={user}
+        loginWithGitHub={loginWithGitHub}
+        handleSignOut={handleSignOut}
+      />
 
       <section className="home">
         <h1>Your AI prompts, in one place.</h1>
