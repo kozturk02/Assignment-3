@@ -1,16 +1,19 @@
-import { Link } from 'react-router-dom';
+import HeaderPanel from '../components/HeaderPanel';
 
 function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOut }) {
   let loginButton = (loggedIn ? "Continue to Dashboard" : "Continue to Sign In");
 
   return (
     <main>
+      <section className="header">
         <HeaderPanel
           loggedIn={loggedIn}
           user={user}
           loginWithGitHub={loginWithGitHub}
           handleSignOut={handleSignOut}
         />
+      </section>
+
       <section className="home">
         <h1>Your AI prompts, in one place.</h1>
         <p>Save, review and improve the prompts you want to keep.</p>

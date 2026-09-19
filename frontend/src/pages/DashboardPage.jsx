@@ -1,3 +1,5 @@
+import HeaderPanel from '../components/HeaderPanel';
+import HistoryPanel from '../components/HistoryPanel';
 import { useEffect, useState } from 'react';
 import { getCapsules, deleteCapsule } from '../api';
 
@@ -27,12 +29,15 @@ function DashboardPage({ handleSignOut, user }) {
 
   return (
     <main>
-      <HeaderPanel
-        loggedIn={loggedIn}
-        user={user}
-        loginWithGitHub={loginWithGitHub}
-        handleSignOut={handleSignOut}
-      />
+      <section className="header">
+        <HeaderPanel
+          loggedIn={loggedIn}
+          user={user}
+          loginWithGitHub={loginWithGitHub}
+          handleSignOut={handleSignOut}
+        />
+      </section>
+
       <section className="dashboard">
         <div className="dashboard-heading">
           <div>
