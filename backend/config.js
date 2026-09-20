@@ -13,7 +13,7 @@ function makeUrl(host, port) {
 }
 
 const FRONTEND_URL = makeUrl(FRONTEND_HOST, FRONTEND_PORT);
-const BACKEND_URL = makeUrl(BACKEND_HOST, process.env.BACKEND_PORT);
+const BACKEND_URL = makeUrl(BACKEND_HOST, BACKEND_PORT);
 const GITHUB_CALLBACK = `${BACKEND_URL}/auth/github/callback`;
 
 const CROSS_SITE = FRONTEND_HOST !== BACKEND_HOST;

@@ -54,10 +54,21 @@ app.post('/api/capsules', requireAuth, (req, res) => {
     improved,
     screenshot_url,
     notes
-  } = req.body;
+  } = req.body || {};
 
-  if (!project_name || !prompt_title || !prompt_text) {
+  if (
+    [project_name, prompt_title, prompt_text].some(
+      value => typeof value !== 'string' || !value.trim()
+    )
+  ) {
     return res.status(400).json({ error: 'Required fields are missing' });
+  }
+
+  if (
+    [prompt_version, response_summary, category, usefulness, screenshot_url, notes]
+      .some(value => value != null && typeof value !== 'string')
+  ) {
+    return res.status(400).json({ error: 'Optional text fields must contain text' });
   }
 
   try {
@@ -123,10 +134,21 @@ app.put('/api/capsules/:id', requireAuth, (req, res) => {
     improved,
     screenshot_url,
     notes
-  } = req.body;
+  } = req.body || {};
 
-  if (!project_name || !prompt_title || !prompt_text) {
+  if (
+    [project_name, prompt_title, prompt_text].some(
+      value => typeof value !== 'string' || !value.trim()
+    )
+  ) {
     return res.status(400).json({ error: 'Required fields are missing' });
+  }
+
+  if (
+    [prompt_version, response_summary, category, usefulness, screenshot_url, notes]
+      .some(value => value != null && typeof value !== 'string')
+  ) {
+    return res.status(400).json({ error: 'Optional text fields must contain text' });
   }
 
   try {

@@ -18,7 +18,7 @@ function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOu
         <p>Save, review and improve the prompts you want to keep.</p>
 
         <button
-          className={`main-button ${!loggedIn ? 'github-main-button' : ''}`}
+          className="main-button github-main-button"
           onClick={loggedIn ? openDashboard : loginWithGitHub}
         >
           {<GitHubIcon className="github-icon" />}
