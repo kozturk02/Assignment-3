@@ -620,7 +620,17 @@ The deployed CRUD verification procedure is:
 
 Actual test result and date:
 
-[TODO: complete this test on the deployed application and record the actual result and date.]
+Test date: 20 September 2026
+
+CRUD testing was completed successfully on the deployed Render application:
+
+- CREATE: A new prompt record was saved and appeared on the dashboard.
+- READ: The saved record and its details were displayed correctly.
+- UPDATE: Changes to the record were saved and displayed correctly.
+- DELETE: The record was removed and no longer appeared on the dashboard.
+
+All four CRUD operations worked successfully through the React interface
+and protected Express API after GitHub login.
 
 The corresponding API operations are:
 
