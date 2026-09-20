@@ -1,452 +1,730 @@
 # AI Capsule
 
-AI Capsule is a private prompt library built with React, Node.js, Express and SQLite.
+AI Capsule is a full-stack web application for saving and managing useful AI prompts.
 
-Users sign in through GitHub OAuth and can create, read, update and delete their own prompt records. Express issues an application JWT after login and verifies it before allowing access to capsule data.
+The application uses a React frontend, Node.js/Express backend and SQLite database. Users authenticate through GitHub OAuth and can create, view, update and delete their own prompt records.
 
-## Deployment details
+## Deployed Application
 
-- Public HTTPS URL: [TODO: insert the deployed application URL]
-- Cloud platform: [TODO: insert the platform used]
-- Deployment date: [TODO: insert the date]
-- Deployed storage persistence: [TODO: state whether the SQLite file is persistent or ephemeral and explain why]
+**Public URL:**  
+https://api-capsule-kayahan.onrender.com/
 
-The deployment design serves the React production build and Express API from the same public HTTPS URL.
+**Cloud platform:**  
+Render Web Service
 
-Keep the deployed application available until marking is complete.
+The React production build and Express backend are served from the same public application and URL.
 
-## Requirements
+---
 
-- Node.js 24 and npm.
-- A GitHub OAuth application.
-- A cloud platform capable of running the Express server for deployment.
+## Technology
 
-Run the following commands from the project root unless another directory is specified.
+- React
+- Vite
+- Node.js
+- Express
+- SQLite
+- GitHub OAuth
+- JSON Web Tokens (JWT)
+- Render
 
-## Local installation
+---
 
-Install the dependencies:
+## Installation
+
+Clone or extract the project and open a terminal in the project root.
+
+Use Node.js 24 and npm.
+
+Install the backend dependencies:
 
 ```bash
 npm --prefix backend install
-npm --prefix frontend install --include=dev
 ```
 
-If `backend/.env` does not already exist, copy `backend/.env.example` to `backend/.env`.
-
-On Linux or macOS:
+Install the frontend dependencies:
 
 ```bash
-cp backend/.env.example backend/.env
+npm --prefix frontend install
 ```
 
-On Windows PowerShell:
+Create `backend/.env` using `backend/.env.example` as a template.
 
-```powershell
-Copy-Item -LiteralPath backend/.env.example -Destination backend/.env
-```
+Replace the example JWT secret and GitHub OAuth credentials with your own values.
 
-If the file already exists, update its settings while preserving the real secret values.
+The `.env` file is for local configuration and must not be committed to the repository. Real JWT and GitHub OAuth secrets must not appear in the README or submitted source code.
 
-Configure these local settings:
+---
 
-```dotenv
-NODE_ENV=development
-FRONTEND_HOST=localhost
-BACKEND_HOST=localhost
-FRONTEND_PORT=5173
-BACKEND_PORT=3001
-FRONTEND_DIST=../frontend/dist
-```
+## Local Development
 
-Set real values for the following variables in `backend/.env`:
-
-- `JWT_SECRET`
-- `GITHUB_CLIENT_ID`
-- `GITHUB_CLIENT_SECRET`
-
-Use a long, randomly generated JWT secret. Do not commit the `.env` file.
-
-Configure the GitHub OAuth application for local testing:
-
-- Homepage URL: `http://localhost:5173`
-- Authorization callback URL: `http://localhost:3001/auth/github/callback`
-
-The OAuth credentials must belong to the application whose callback URL is configured for the environment being tested.
-
-## Running locally
-
-Start the backend in one terminal:
+Start the backend:
 
 ```bash
-cd backend
-npm run dev
+npm --prefix backend run dev
+```
+
+The backend runs on port `3001` by default:
+
+```text
+http://localhost:3001
 ```
 
 Start the frontend in another terminal:
 
 ```bash
-cd frontend
-npm run dev
+npm --prefix frontend run dev
 ```
 
-Open `http://localhost:5173`.
+The frontend runs on port `5173` by default:
 
-The Express backend runs at `http://localhost:3001`.
-
-The SQLite database and capsules table are created automatically when the backend starts.
-
-### Optional Ubuntu setup script
-
-After installing Node.js and npm, run:
-
-```bash
-chmod +x setup_ubuntu.sh run_backend.sh run_frontend.sh
-./setup_ubuntu.sh
+```text
+http://localhost:5173
 ```
 
-The script:
+For local development, configure the GitHub OAuth application with:
 
-- Creates `backend/.env` from the example if it is missing.
-- Installs backend and frontend dependencies.
-- Checks backend JavaScript syntax.
-- Initialises and checks the SQLite table.
-- Builds the frontend into `frontend/dist`.
+```text
+Homepage URL:
+http://localhost:5173
 
-Configure the real OAuth credentials and JWT secret before starting the application.
-
-The helper scripts start the local development servers:
-
-```bash
-./run_backend.sh
+Authorization callback URL:
+http://localhost:3001/auth/github/callback
 ```
 
-```bash
-./run_frontend.sh
+---
+
+## Project Structure
+
+The project is separated into a React frontend and Express backend.
+
+```text
+frontend/
+├── src/
+│   ├── App.jsx
+│   ├── api.js
+│   ├── App.css
+│   ├── pages/
+│   └── components/
+├── package.json
+└── vite.config.js
+
+backend/
+├── index.js
+├── auth.js
+├── config.js
+├── db.js
+├── package.json
+├── .env.example
+└── .env                 # Local configuration; excluded from Git
 ```
 
-## Cloud deployment
+The React frontend provides the user interface.
 
-These instructions deploy the frontend and backend together under one public HTTPS URL.
+`frontend/src/api.js` communicates with Express using `fetch` and:
 
-Configure the cloud service to use Node.js 24 and the repository root as its working directory.
-
-Use this build command:
-
-```bash
-npm --prefix backend install && npm --prefix frontend install --include=dev && npm --prefix frontend run build
+```js
+credentials: 'include'
 ```
 
-Use this start command:
+This allows the browser to send the authentication cookie with protected API requests.
 
-```bash
-cd backend && npm start
+During local development, the frontend communicates with the backend development host and port.
+
+In production, React uses relative API paths because the React production build and Express API are served from the same public URL.
+
+---
+
+## Application Pages
+
+### `/`
+
+Public landing page explaining AI Capsule and providing GitHub login.
+
+### `/dashboard`
+
+React dashboard containing the authenticated user's prompt records.
+
+The frontend checks the current authenticated session before allowing the dashboard to be displayed.
+
+The protected data remains secured by JWT authentication on the Express API.
+
+---
+
+## API Routes
+
+### Public
+
+```text
+GET  /api/health
+GET  /login
+GET  /auth/github/callback
+POST /logout
 ```
 
-Configure these environment variables on the cloud platform:
-
-```dotenv
-NODE_ENV=production
-FRONTEND_HOST=YOUR_APP_HOSTNAME
-BACKEND_HOST=YOUR_APP_HOSTNAME
-FRONTEND_DIST=../frontend/dist
-```
-
-Replace `YOUR_APP_HOSTNAME` with the actual public hostname. Do not include `https://`, a path or a trailing slash.
-
-Set these secrets through the cloud platform's environment settings:
-
-- `JWT_SECRET`
-- `GITHUB_CLIENT_ID`
-- `GITHUB_CLIENT_SECRET`
-
-The backend reads the platform-provided `PORT`. If it is absent, the backend uses `BACKEND_PORT`, or port `3001` by default.
-
-Configure the GitHub OAuth application for deployment:
-
-- Homepage URL: `https://YOUR_APP_HOSTNAME`
-- Authorization callback URL: `https://YOUR_APP_HOSTNAME/auth/github/callback`
-
-With `NODE_ENV=production`, Express serves `frontend/dist`, supports direct navigation to `/dashboard`, and sets the application cookie with the Secure attribute.
-
-The build command explicitly installs frontend development dependencies because Vite is required to build the React application.
-
-## Environment variables
-
-### Backend
-
-| Variable | Purpose |
-| --- | --- |
-| `NODE_ENV` | Use `development` locally and `production` in the HTTPS deployment. |
-| `FRONTEND_HOST` | Frontend hostname without a protocol or path. Defaults to `localhost`. |
-| `BACKEND_HOST` | Backend hostname without a protocol or path. Defaults to `localhost`. |
-| `FRONTEND_PORT` | Local frontend port. Defaults to `5173`. |
-| `BACKEND_PORT` | Backend listening port when `PORT` is absent. Defaults to `3001`. |
-| `PORT` | Cloud-provided listening port; takes precedence over `BACKEND_PORT`. |
-| `JWT_SECRET` | Secret used by Express to sign and verify application JWTs. |
-| `GITHUB_CLIENT_ID` | GitHub OAuth application client ID. |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth application client secret. |
-| `FRONTEND_DIST` | React build directory, resolved relative to the backend directory. Defaults to `../frontend/dist`. |
-
-Production public URLs use HTTPS without exposing the backend's internal listening port.
-
-### Optional frontend development settings
-
-The frontend also supports these variables in `frontend/.env`:
-
-| Variable | Purpose |
-| --- | --- |
-| `VITE_BACKEND_HOST` | Overrides the backend hostname used during frontend development. |
-| `VITE_BACKEND_PORT` | Overrides the development API port, which defaults to `3001`. |
-
-Restart the frontend development server after changing these settings.
-
-In production, React uses relative API paths and communicates with Express on the same public origin.
-
-## Pages and API routes
-
-| Method | Route | Access | Purpose |
-| --- | --- | --- | --- |
-| GET | `/` | Public | Explains AI Capsule and provides the login entry point. |
-| GET | `/login` | Public | Starts GitHub OAuth login. |
-| GET | `/auth/github/callback` | OAuth callback | Completes OAuth login and issues the application JWT. |
-| GET | `/dashboard` | Protected application | Displays the authenticated user's prompt records. |
-| GET | `/api/health` | Public | Returns `{"status":"ok"}`. |
-| GET | `/api/auth/me` | JWT required | Checks the current authenticated session. |
-| GET | `/api/capsules` | JWT required | Lists the authenticated user's records. |
-| POST | `/api/capsules` | JWT required | Creates a record owned by the authenticated user. |
-| PUT | `/api/capsules/:id` | JWT required | Updates a record owned by the authenticated user. |
-| DELETE | `/api/capsules/:id` | JWT required | Deletes a record owned by the authenticated user. |
-| POST | `/logout` | Public | Clears the application session cookie. |
-
-React uses the functions in `frontend/src/api.js` to call Express through `fetch`.
-
-Requests use `credentials: 'include'` so the browser sends the application cookie. Create and update requests send JSON bodies.
-
-The dashboard checks the session before displaying the protected application. The backend independently verifies authentication on every capsule request.
-
-## OAuth, JWT and ownership
-
-The authentication flow is:
-
-1. The user opens `/login`.
-2. Express creates a random OAuth state value and redirects to GitHub.
-3. GitHub redirects to `/auth/github/callback` after authentication.
-4. Express checks the OAuth state and exchanges the code for a GitHub access token.
-5. Express retrieves the GitHub user's identity.
-6. Express creates its own application JWT containing the GitHub user ID.
-7. Express stores that JWT in a cookie named `token`.
-8. The browser is redirected to `/dashboard`.
-
-The GitHub access token is used by the backend to retrieve the user's identity. It is not used as the application's session JWT.
-
-The application JWT:
-
-- Is signed using `JWT_SECRET`.
-- Expires after two hours.
-- Is stored in an HttpOnly cookie named `token`.
-- Uses the Secure cookie attribute in production.
-- Is verified server-side using `jsonwebtoken.verify`.
-
-For the documented deployment, frontend and backend use the same hostname and the cookie uses `SameSite=Lax`.
-
-Local HTTP development uses a non-Secure cookie. The deployed application must use HTTPS and `NODE_ENV=production`.
-
-All four capsule CRUD routes use `requireAuth`.
-
-Requests with a missing or invalid JWT return `401` without capsule data.
-
-For CRUD operations, the record owner comes from `req.user.userId`, obtained from the verified JWT. A browser-supplied `user_id` is not used.
-
-Read queries filter by `user_id`. Update and delete queries match both the record ID and authenticated user ID. An inaccessible or nonexistent record returns `404`.
-
-## Database and record model
-
-The application uses SQLite through `better-sqlite3`.
-
-`backend/db.js` opens `capsules.db` relative to the backend process's working directory. With the documented start command, the database is stored in `backend/capsules.db`.
-
-The capsules table is created automatically using `CREATE TABLE IF NOT EXISTS`.
-
-| Field | Stored information |
-| --- | --- |
-| `id` | Automatically generated record ID. |
-| `user_id` | GitHub user ID obtained from the verified application JWT. |
-| `project_name` | Project or assignment name. |
-| `prompt_title` | Short prompt title. |
-| `prompt_version` | Version text, such as `v1` or `v2`. |
-| `prompt_text` | The prompt itself. |
-| `response_summary` | Summary of the AI response. |
-| `category` | Task category. |
-| `usefulness` | Rating stored as text; the interface uses values from 1 to 5. |
-| `reviewed` | Whether the response was checked, stored as 0 or 1. |
-| `improved` | Whether the output was improved, stored as 0 or 1. |
-| `screenshot_url` | Optional screenshot URLs stored as JSON text. |
-| `notes` | Additional reflection or comments. |
-| `created_at` | Timestamp generated automatically by SQLite. |
-
-Project name, prompt title and prompt text must contain non-empty text.
-
-Create and update requests validate required fields and optional text field types before performing database operations.
-
-SQL statements use bound parameters, and ownership conditions are included in the queries.
-
-### Storage persistence
-
-The database is a local file. Its durability depends on whether the hosting platform preserves that file.
-
-If the deployed filesystem is ephemeral, records can be lost after a restart, replacement or redeployment. A persistent disk must preserve the actual database location to retain those records.
-
-Actual deployed storage arrangement:
-
-[TODO: explain where the SQLite file is stored, whether that location is persistent, and what happens after a restart or redeployment.]
-
-## Verification and required cURL results
-
-Replace `YOUR_APP_HOSTNAME` in the commands below with the deployed hostname.
-
-In Windows PowerShell, use `curl.exe` instead of `curl` if `curl` resolves to a PowerShell alias.
-
-### Public health check
-
-```bash
-curl -i https://YOUR_APP_HOSTNAME/api/health
-```
-
-Expected status: `200`.
-
-Expected response body:
+The health endpoint returns:
 
 ```json
 {"status":"ok"}
 ```
 
-Actual result and date:
+### Authentication
 
-[TODO: record the result obtained from the deployed application.]
-
-### Test 1: no authentication
-
-```bash
-curl -i https://YOUR_APP_HOSTNAME/api/capsules
+```text
+GET /api/auth/me
 ```
 
-Expected status: `401 Unauthorized`.
+This verifies the current application JWT and returns the authenticated user information when the session is valid.
 
-Expected response body:
+### Protected Capsule API
 
-```json
+```text
+GET    /api/capsules
+POST   /api/capsules
+PUT    /api/capsules/:id
+DELETE /api/capsules/:id
+```
+
+All capsule API routes use JWT authentication middleware.
+
+A request without a valid application JWT returns:
+
+```text
+401 Unauthorized
+```
+
+---
+
+## CRUD Behaviour
+
+### Create
+
+New records are created through:
+
+```text
+POST /api/capsules
+```
+
+The authenticated user's ID is taken from the verified JWT.
+
+The frontend does not provide `user_id`.
+
+### Read
+
+Records are loaded through:
+
+```text
+GET /api/capsules
+```
+
+The SQL query only returns records belonging to the authenticated `user_id`.
+
+### Update
+
+Existing records are updated through:
+
+```text
+PUT /api/capsules/:id
+```
+
+The backend checks both the capsule ID and authenticated `user_id` before updating the record.
+
+### Delete
+
+Records are deleted through:
+
+```text
+DELETE /api/capsules/:id
+```
+
+The delete query also checks both the capsule ID and authenticated `user_id`.
+
+This prevents an authenticated user from updating or deleting a record belonging to another user.
+
+---
+
+## Prompt Data
+
+Each capsule can store:
+
+- `id`
+- `user_id`
+- `project_name`
+- `prompt_title`
+- `prompt_version`
+- `prompt_text`
+- `response_summary`
+- `category`
+- `usefulness`
+- `reviewed`
+- `improved`
+- `screenshot_url`
+- `notes`
+- `created_at`
+
+Screenshot evidence is stored as URLs rather than uploading image files to the server.
+
+---
+
+## Database
+
+SQLite is used to store the capsule records.
+
+The database and `capsules` table are automatically initialised when the backend starts.
+
+When started using the documented commands, the database file is:
+
+```text
+backend/capsules.db
+```
+
+The `user_id` is obtained from the verified application JWT and is not supplied by the browser.
+
+The `created_at` timestamp is generated automatically by SQLite.
+
+### Cloud Storage
+
+The deployed Render application uses SQLite on the service's local filesystem.
+
+This filesystem is ephemeral. Saved records are lost when the service restarts or redeploys.
+
+On Render's Free plan, records are also lost when the service spins down after inactivity. Free services normally spin down after 15 minutes without incoming traffic.
+
+The database and table are recreated when the backend starts, but previously saved records are not restored.
+
+This is a known limitation of the submitted application.
+
+---
+
+## GitHub OAuth and JWT Authentication
+
+GitHub OAuth is used to authenticate users.
+
+The authentication process is:
+
+1. The user selects GitHub login.
+2. Express generates a random OAuth `state` value.
+3. The browser is redirected to GitHub.
+4. GitHub redirects the browser back to `/auth/github/callback`.
+5. Express verifies the returned OAuth `state`.
+6. Express exchanges the GitHub authorization code for a GitHub access token.
+7. Express requests the authenticated GitHub user's information.
+8. Express creates its own application JWT.
+9. The JWT is stored in a cookie named `token`.
+10. Protected API requests verify that JWT before allowing access.
+
+The application JWT is separate from the GitHub OAuth access token.
+
+The JWT contains the authenticated GitHub user ID and basic user information required by the application.
+
+The JWT expires after two hours.
+
+In production, the `token` cookie is configured as:
+
+```text
+HttpOnly
+Secure
+SameSite=Lax
+```
+
+Because the deployed React frontend and Express backend are served from the same site, a cross-site authentication cookie is not required.
+
+The JWT is verified on the Express server using `jsonwebtoken.verify`.
+
+The application does not store the JWT in `localStorage` and does not send it as a browser-supplied Bearer token.
+
+---
+
+## User Ownership
+
+Each capsule belongs to the authenticated GitHub user.
+
+Ownership is determined using:
+
+```text
+req.user.userId
+```
+
+This comes from the verified application JWT.
+
+CREATE stores this authenticated user ID as the owner.
+
+READ filters records by the authenticated user ID.
+
+UPDATE and DELETE both require:
+
+```text
+capsule id
+authenticated user_id
+```
+
+The frontend never supplies the owner `user_id`.
+
+This ownership behaviour was checked by reviewing the CREATE, READ, UPDATE and DELETE queries and confirming that each operation derives the user identity from the verified JWT rather than request data.
+
+---
+
+## Environment Variables
+
+The backend supports the following environment variables:
+
+```text
+NODE_ENV
+FRONTEND_HOST
+BACKEND_HOST
+FRONTEND_PORT
+BACKEND_PORT
+PORT
+FRONTEND_DIST
+JWT_SECRET
+GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET
+```
+
+`FRONTEND_HOST` and `BACKEND_HOST` contain only the hostname and do not include a protocol or URL path.
+
+Local example, containing placeholders rather than real secrets:
+
+```env
+NODE_ENV=development
+
+FRONTEND_HOST=localhost
+FRONTEND_PORT=5173
+
+BACKEND_HOST=localhost
+BACKEND_PORT=3001
+
+JWT_SECRET=replace-with-a-long-random-secret
+
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+
+FRONTEND_DIST=../frontend/dist
+```
+
+The application constructs the frontend URL, backend URL and GitHub callback URL internally from these values.
+
+The backend uses the cloud-provided `PORT` value when available.
+
+If `PORT` is not provided, `BACKEND_PORT` is used.
+
+The default backend port is `3001`.
+
+`FRONTEND_DIST` defaults to:
+
+```text
+../frontend/dist
+```
+
+For optional frontend development configuration, these variables can be provided in the frontend environment:
+
+```text
+VITE_BACKEND_HOST
+VITE_BACKEND_PORT
+```
+
+Secret values such as `JWT_SECRET` and `GITHUB_CLIENT_SECRET` are configured through backend environment variables and must not be committed to GitHub or included in frontend code.
+
+Render also supports `NODE_VERSION` for selecting the Node.js runtime version.
+
+---
+
+## Cloud Deployment
+
+The application is deployed using Render as a Node.js Web Service.
+
+The React application is built into:
+
+```text
+frontend/dist
+```
+
+Express serves this production build together with the API.
+
+Render's Root Directory setting is left blank so that both the `frontend` and `backend` folders are available.
+
+### Build Command
+
+From the repository root:
+
+```bash
+npm --prefix backend install && npm --prefix frontend install --include=dev && npm --prefix frontend run build
+```
+
+### Start Command
+
+```bash
+cd backend && npm start
+```
+
+### Production Environment
+
+The deployed application uses:
+
+```env
+NODE_ENV=production
+
+FRONTEND_HOST=api-capsule-kayahan.onrender.com
+BACKEND_HOST=api-capsule-kayahan.onrender.com
+
+FRONTEND_DIST=../frontend/dist
+```
+
+The following credentials are configured through Render's environment settings:
+
+```text
+JWT_SECRET
+GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET
+```
+
+Render provides the backend `PORT` automatically.
+
+### GitHub OAuth Deployment Configuration
+
+The GitHub OAuth application uses:
+
+```text
+Homepage URL:
+https://api-capsule-kayahan.onrender.com
+
+Authorization callback URL:
+https://api-capsule-kayahan.onrender.com/auth/github/callback
+```
+
+---
+
+## Required cURL Checks
+
+The following deployed responses were independently checked during the review on 20 September 2026.
+
+### Health Check
+
+Command:
+
+```bash
+curl -i https://api-capsule-kayahan.onrender.com/api/health
+```
+
+Windows PowerShell:
+
+```powershell
+curl.exe -i https://api-capsule-kayahan.onrender.com/api/health
+```
+
+Observed status and response body:
+
+```text
+HTTP/1.1 200 OK
+{"status":"ok"}
+```
+
+### Test 1 — No Authentication
+
+Command:
+
+```bash
+curl -i https://api-capsule-kayahan.onrender.com/api/capsules
+```
+
+Windows PowerShell:
+
+```powershell
+curl.exe -i https://api-capsule-kayahan.onrender.com/api/capsules
+```
+
+Observed status and response body:
+
+```text
+HTTP/1.1 401 Unauthorized
 {"error":"Unauthorized"}
 ```
 
-Actual result and date:
+### Test 2 — Invalid JWT
 
-[TODO: paste the actual status and response obtained from the deployed application.]
-
-### Test 2: fake JWT
+Command:
 
 ```bash
-curl -i -H "Cookie: token=fake-token-123" https://YOUR_APP_HOSTNAME/api/capsules
+curl -i -H "Cookie: token=fake-token-123" https://api-capsule-kayahan.onrender.com/api/capsules
 ```
 
-Expected status: `401 Unauthorized`.
+Windows PowerShell:
 
-Expected response body:
+```powershell
+curl.exe -i -H "Cookie: token=fake-token-123" https://api-capsule-kayahan.onrender.com/api/capsules
+```
 
-```json
+Observed status and response body:
+
+```text
+HTTP/1.1 401 Unauthorized
 {"error":"Unauthorized"}
 ```
 
-Actual result and date:
+These tests demonstrate that the deployed endpoint rejects both a missing JWT and the supplied invalid JWT.
 
-[TODO: paste the actual status and response obtained from the deployed application.]
+Code inspection also confirms that all four CRUD routes use the server-side JWT verification middleware.
 
-### Browser and ownership verification
+No real application JWT is included in these commands or results.
 
-Perform these checks against the deployed application and record the actual outcomes.
+---
 
-| Check | Expected behaviour | Actual result |
-| --- | --- | --- |
-| Open `/dashboard` while logged out | The protected application is unavailable and no capsule data is returned. | TODO |
-| Complete GitHub OAuth login | The user reaches the dashboard with an authenticated session. | TODO |
-| Inspect cookie attributes without recording its value | Cookie is named `token` and has HttpOnly and Secure attributes. | TODO |
-| Create a record | The record is saved and displayed. | TODO |
-| Refresh the dashboard | The saved record is loaded from the database. | TODO |
-| Update the record | The changed values remain after refreshing. | TODO |
-| Delete the record | The record disappears and remains deleted after refreshing. | TODO |
-| Sign in as a second GitHub user | The second user cannot list the first user's records. | TODO |
-| Attempt update/delete of the first user's record using the second user's session | The API returns `404` and the original record is unchanged. | TODO |
-| Log out | The session cookie is cleared and protected API access returns `401`. | TODO |
+## Verification
 
-Record the test date and any issue found:
+### OAuth Login
 
-[TODO: insert the real deployed verification results.]
+GitHub OAuth was tested by authenticating through GitHub and returning to the application.
 
-Do not include a real JWT, OAuth secret or JWT secret in recorded results.
+After login, the application calls:
 
-## AI-assisted development
+```text
+GET /api/auth/me
+```
 
-### Tools used
+This verifies the authenticated session and retrieves the user information stored in the application JWT.
 
-Codex was used to review the assignment requirements, inspect the implementation, suggest fixes and check proposed configuration and route behaviour in memory.
+### JWT Protection
 
-Other AI tools used:
+JWT protection was checked using the two required deployed cURL tests.
 
-[TODO: list any other tools actually used, or write "None".]
+A request with no authentication returned:
 
-### Problem found and corrected in an AI suggestion
+```text
+401 Unauthorized
+```
 
-An initial AI-proposed validation change checked only the required text fields.
+A request with:
 
-This still allowed a numeric value in an optional field such as `notes` to reach `.trim()` and cause a `500` response.
+```text
+token=fake-token-123
+```
 
-The revised `validateCapsule` middleware checks that the request body is an object, that required fields contain non-empty text, and that optional text fields contain strings when supplied.
+also returned:
 
-In-memory checks reproduced the earlier `500` and confirmed that the revised validation returns `400` for the same invalid input.
+```text
+401 Unauthorized
+```
 
-A separate configuration issue was also identified: the OAuth callback used `process.env.BACKEND_PORT` directly instead of the resolved backend port. The revised configuration uses `BACKEND_PORT`, including its default and `PORT` override.
+The backend implementation was reviewed to confirm that Express calls `jsonwebtoken.verify` before protected route handlers run.
 
-### Verification performed during the review
+### CRUD
 
-The proposed backend changes were checked for:
+The deployed CRUD verification procedure is:
 
-- JavaScript syntax.
-- Default and custom OAuth callback ports.
-- Production HTTPS callback construction.
-- Create, read, update and delete behaviour.
-- Storage of the required record fields.
-- Two-user ownership isolation.
-- Rejection of invalid request bodies and text field types.
+1. Sign in through GitHub.
+2. Create a prompt record through the React interface.
+3. Refresh the dashboard and confirm that the record is loaded from SQLite.
+4. Edit the record.
+5. Refresh again and confirm that the updated values remain.
+6. Delete the record.
+7. Refresh again and confirm that the record remains absent.
 
-The route checks used an in-memory SQLite database with mocked Express and JWT dependencies. They did not verify real JWT cryptography, a running HTTP server, browser behaviour or live GitHub OAuth.
+Actual test result and date:
 
-Actual deployed OAuth, JWT protection, CRUD and ownership verification must be recorded in the verification section above.
+[TODO: complete this test on the deployed application and record the actual result and date.]
 
-### Implementation decision
+The corresponding API operations are:
 
-The application serves the React production build from Express under one public URL.
+```text
+CREATE -> POST /api/capsules
+READ   -> GET /api/capsules
+UPDATE -> PUT /api/capsules/:id
+DELETE -> DELETE /api/capsules/:id
+```
 
-This lets React use relative API paths and keeps the browser session on the same origin. It reduces the cloud configuration needed for CORS and cross-origin cookies.
+### Ownership
 
-SQLite provides the required relational record storage without requiring a separate database service. The deployed filesystem's persistence must still be documented.
+User ownership was verified through code inspection by checking that:
 
-## Known limitation
+- `user_id` is never accepted as the record owner from the frontend.
+- CREATE gets the owner from the verified JWT.
+- READ filters records using the authenticated user ID.
+- UPDATE checks both the capsule ID and authenticated user ID.
+- DELETE checks both the capsule ID and authenticated user ID.
 
-Updating a capsule replaces its previous contents. The application stores a prompt version label but does not automatically preserve earlier revisions.
+This describes implementation review rather than claiming that a deployed two-account test was performed.
 
-## Submission checklist
+---
 
-- Replace all TODO fields in this README with accurate information.
-- Confirm the public application is working over HTTPS.
-- Confirm `/api/health` returns the required response.
-- Record both required cURL tests returning `401`.
-- Demonstrate GitHub OAuth login and complete CRUD on the deployed application.
-- Prepare a source-code ZIP containing the project, README, package files and database setup code.
-- Exclude `node_modules`, generated build folders, `.env` files and personal database files from the source ZIP.
-- Include `.env.example` with placeholder values.
-- Record a 3-5 minute MP4 with working audio.
-- Show the deployed URL, health check, both cURL tests, OAuth login, CRUD, cloud settings and environment-variable names.
-- Explain the storage approach and one deployment issue or limitation.
-- Keep secret values and real JWTs out of the video.
-- Upload both the ZIP and MP4 directly to the LMS.
-- Check that the uploaded video and audio work.
+## AI-Assisted Development
+
+ChatGPT was used during development and review to inspect the assignment requirements, inspect code, identify problems, explain full-stack concepts and suggest improvements to the React, Express, OAuth/JWT and deployment configuration.
+
+Suggested changes were checked against the assignment requirements and the behaviour of the application.
+
+### Problems Identified and Corrected
+
+One problem found during review was that the frontend originally used a hard-coded backend address:
+
+```text
+http://localhost:3001
+```
+
+This would work locally but would fail when the application was deployed to a public cloud host.
+
+The configuration was changed so that development host and port values are configurable, while the production frontend uses relative API paths because React and Express are served from the same public URL.
+
+Another issue identified during review was that the original GitHub OAuth flow did not use an OAuth `state` value.
+
+A random `state` value is now generated before redirecting to GitHub and validated when GitHub returns to the callback endpoint.
+
+GitHub API responses were also updated to be checked before their data is trusted. The application verifies the access-token response and GitHub user response before creating an application JWT.
+
+The original screenshot implementation allowed uploaded image files to be converted to base64 data and placed inside JSON requests. This was unnecessary for the assignment and could exceed the Express JSON body limit. Screenshot evidence was simplified to URL-only storage.
+
+Error handling was also improved so that failed create, load, update or delete operations can display an error to the user rather than only writing the error to the browser console.
+
+During deployment review, the API response initially showed:
+
+```text
+access-control-allow-origin: https://localhost
+```
+
+The Render host configuration was corrected. A later public API check confirmed:
+
+```text
+access-control-allow-origin: https://api-capsule-kayahan.onrender.com
+```
+
+### OAuth and JWT Verification
+
+The OAuth/JWT implementation was reviewed to confirm that:
+
+- GitHub OAuth identifies the user.
+- Express creates its own application JWT.
+- The GitHub access token is not used as the application session token.
+- The JWT is stored in an HttpOnly `token` cookie.
+- Production uses a Secure cookie.
+- Protected routes verify the JWT server-side.
+- Missing and invalid JWTs return `401 Unauthorized`.
+
+The deployed no-token and fake-token cURL tests were also used to verify the protected API behaviour.
+
+### CRUD and Ownership Verification
+
+The CRUD routes were reviewed to confirm that CREATE, READ, UPDATE and DELETE all use the authenticated identity from the verified JWT.
+
+The frontend does not submit `user_id`.
+
+The SQL queries restrict capsule access using the authenticated user's ID.
+
+During the AI-assisted review, proposed backend changes were also checked using an in-memory SQLite database and mocked Express/authentication dependencies. These checks covered route behaviour and ownership logic; they did not replace deployed browser testing or verify real OAuth authentication.
+
+The actual deployed CRUD test result is recorded in the Verification section.
+
+### Implementation Decision
+
+One implementation decision was to deploy the React frontend and Express backend together under one public Render URL.
+
+Express serves the React production build and the API from the same application.
+
+This allows the frontend to use relative API paths, reduces unnecessary CORS complexity and simplifies the authentication cookie configuration.
+
+---
+
+## Limitations
+
+The deployed version uses SQLite on Render's ephemeral local filesystem.
+
+Saved records are lost when the service restarts or redeploys. On Render's Free plan, this also occurs when the service spins down after inactivity.
+
+The application also stores `prompt_version` as a text value such as `v1`, `v2` or `v3`. Updating a capsule changes the existing record rather than automatically keeping a complete historical copy of every previous version.
