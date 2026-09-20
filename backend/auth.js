@@ -59,6 +59,7 @@ router.get('/login', (req, res) => {
   const params = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID,
     redirect_uri: GITHUB_CALLBACK,
+    scope: 'read:user user:email',
     state,
     prompt: 'select_account'
   });
@@ -101,13 +102,15 @@ router.get('/auth/github/callback', async (req, res) => {
       throw new Error('GitHub did not return an access token');
     }
 
+    const githubHeaders = {
+      Authorization: `Bearer ${tokenData.access_token}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'AI-Capsule',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+
     const userResponse = await fetch('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'AI-Capsule',
-        'X-GitHub-Api-Version': '2022-11-28'
-      }
+      headers: githubHeaders
     });
 
     if (!userResponse.ok) {
@@ -120,9 +123,31 @@ router.get('/auth/github/callback', async (req, res) => {
       throw new Error('GitHub user data is invalid');
     }
 
+    const emailResponse = await fetch('https://api.github.com/user/emails', {
+      headers: githubHeaders
+    });
+
+    if (!emailResponse.ok) {
+      throw new Error(`GitHub email request failed: ${emailResponse.status}`);
+    }
+
+    const emails = await emailResponse.json();
+
+    if (!Array.isArray(emails)) {
+      throw new Error('GitHub email data is invalid');
+    }
+
+    const primaryEmail =
+      emails.find(email => email.primary && email.verified)?.email ||
+      emails.find(email => email.verified)?.email ||
+      githubUser.email ||
+      '';
+
     const token = jwt.sign({
       userId: String(githubUser.id),
       username: githubUser.login,
+      name: githubUser.name || githubUser.login,
+      email: primaryEmail,
       avatarUrl: githubUser.avatar_url || null
     }, process.env.JWT_SECRET, { expiresIn: '2h' });
 

@@ -113,12 +113,10 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
   }
 
   return (
-    <div className="form-backdrop">
-      <form className="capsule-form" onSubmit={handleSubmit}>
+    <div className="form-backdrop" onClick={onClose}>
+      <form className="capsule-form" onSubmit={handleSubmit} onClick={e => e.stopPropagation()}>
         <h2>{editing ? 'Edit capsule' : 'Create capsule'}</h2>
         <p>{editing ? 'Update the saved prompt record.' : 'Save a new prompt record.'}</p>
-
-        {error && <p className="form-error" role="alert">{error}</p>}
 
         <div className="form-row three">
           <label>Project name
@@ -223,13 +221,17 @@ function CapsuleForm({ capsule, onClose, onSaved }) {
         </div>
 
         <div className="form-actions">
-          <button type="button" className="secondary-button" onClick={onClose} disabled={saving}>
-            Cancel
-          </button>
+          <span className="form-error" role="alert">{error}</span>
 
-          <button className="main-button" disabled={saving}>
-            {saving ? 'Saving...' : editing ? 'Save changes' : 'Create capsule'}
-          </button>
+          <div className="form-action-buttons">
+            <button type="button" className="secondary-button" onClick={onClose} disabled={saving}>
+              Cancel
+            </button>
+
+            <button className="main-button" disabled={saving}>
+              {saving ? 'Saving...' : editing ? 'Save changes' : 'Create capsule'}
+            </button>
+          </div>
         </div>
       </form>
     </div>
