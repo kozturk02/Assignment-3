@@ -5,16 +5,17 @@ import { useEffect, useState } from 'react';
 import { getCapsules, deleteCapsule } from '../api';
 
 function DashboardPage({ loggedIn, user, loginWithGitHub, handleSignOut }) {
-
   const [capsules, setCapsules] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editingCapsule, setEditingCapsule] = useState(null);
+  const [error, setError] = useState('');
 
   async function loadCapsules() {
     try {
+      setError('');
       setCapsules(await getCapsules());
     } catch (err) {
-      console.error(err);
+      setError(err.message || 'Could not load prompts.');
     }
   }
 
@@ -24,19 +25,22 @@ function DashboardPage({ loggedIn, user, loginWithGitHub, handleSignOut }) {
 
   async function handleDelete(id) {
     try {
+      setError('');
       await deleteCapsule(id);
-      loadCapsules();
+      await loadCapsules();
     } catch (err) {
-      console.error(err);
+      setError(err.message || 'Could not delete prompt.');
     }
   }
 
   function openCreate() {
+    setError('');
     setEditingCapsule(null);
     setFormOpen(true);
   }
 
   function openEdit(capsule) {
+    setError('');
     setEditingCapsule(capsule);
     setFormOpen(true);
   }
@@ -64,6 +68,8 @@ function DashboardPage({ loggedIn, user, loginWithGitHub, handleSignOut }) {
 
           <button className="main-button" onClick={openCreate}>New prompt</button>
         </div>
+
+        {error && <p className="error-message" role="alert">{error}</p>}
 
         <HistoryPanel
           capsules={capsules}

@@ -21,8 +21,8 @@ function HomePage({ loggedIn, user, loginWithGitHub, openDashboard, handleSignOu
           className={`main-button ${!loggedIn ? 'github-main-button' : ''}`}
           onClick={loggedIn ? openDashboard : loginWithGitHub}
         >
-          {!loggedIn && <GitHubIcon className="github-icon" />}
-          {loggedIn ? 'Continue to Dashboard' : 'Sign in with GitHub'}
+          {<GitHubIcon className="github-icon" />}
+          {loginButton}
         </button>
       </section>
 

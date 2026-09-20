@@ -3,19 +3,34 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const path = require('path');
+const fs = require('fs');
 
 const db = require('./db');
 const { router: authRouter, requireAuth } = require('./auth');
+const { FRONTEND_URL, BACKEND_PORT, production } = require('./config');
+
+const requiredEnv = ['JWT_SECRET', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET'];
+const missingEnv = requiredEnv.filter(name => !process.env[name]);
+
+if (missingEnv.length) {
+  console.error(`Missing environment variables: ${missingEnv.join(', ')}`);
+  process.exit(1);
+}
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = BACKEND_PORT;
+
+if (production) {
+  app.set('trust proxy', 1);
+}
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true,
+  origin: FRONTEND_URL,
+  credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
 app.use(authRouter);
@@ -38,7 +53,7 @@ app.post('/api/capsules', requireAuth, (req, res) => {
     reviewed,
     improved,
     screenshot_url,
-    notes,
+    notes
   } = req.body;
 
   if (!project_name || !prompt_title || !prompt_text) {
@@ -56,17 +71,17 @@ app.post('/api/capsules', requireAuth, (req, res) => {
 
     const result = stmt.run(
       req.user.userId,
-      project_name,
-      prompt_title,
-      prompt_version || '',
-      prompt_text,
-      response_summary || '',
-      category || '',
+      project_name.trim(),
+      prompt_title.trim(),
+      prompt_version?.trim() || '',
+      prompt_text.trim(),
+      response_summary?.trim() || '',
+      category?.trim() || '',
       usefulness || '',
-      reviewed ? 1 : 0,
-      improved ? 1 : 0,
+      Number(reviewed) ? 1 : 0,
+      Number(improved) ? 1 : 0,
       screenshot_url || '',
-      notes || ''
+      notes?.trim() || ''
     );
 
     const newRecord = db
@@ -76,7 +91,7 @@ app.post('/api/capsules', requireAuth, (req, res) => {
     res.status(201).json(newRecord);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Could not create prompt record' });
   }
 });
 
@@ -89,7 +104,8 @@ app.get('/api/capsules', requireAuth, (req, res) => {
 
     res.json(records);
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error(err);
+    res.status(500).json({ error: 'Could not load prompt records' });
   }
 });
 
@@ -106,22 +122,22 @@ app.put('/api/capsules/:id', requireAuth, (req, res) => {
     reviewed,
     improved,
     screenshot_url,
-    notes,
+    notes
   } = req.body;
 
   if (!project_name || !prompt_title || !prompt_text) {
     return res.status(400).json({ error: 'Required fields are missing' });
   }
 
-  const existing = db
-    .prepare('SELECT * FROM capsules WHERE id = ? AND user_id = ?')
-    .get(req.params.id, req.user.userId);
-
-  if (!existing) {
-    return res.status(404).json({ error: 'Capsule not found' });
-  }
-
   try {
+    const existing = db
+      .prepare('SELECT * FROM capsules WHERE id = ? AND user_id = ?')
+      .get(req.params.id, req.user.userId);
+
+    if (!existing) {
+      return res.status(404).json({ error: 'Capsule not found' });
+    }
+
     const stmt = db.prepare(`
       UPDATE capsules SET
         project_name = ?, prompt_title = ?, prompt_version = ?,
@@ -132,17 +148,17 @@ app.put('/api/capsules/:id', requireAuth, (req, res) => {
     `);
 
     stmt.run(
-      project_name,
-      prompt_title,
-      prompt_version || '',
-      prompt_text,
-      response_summary || '',
-      category || '',
+      project_name.trim(),
+      prompt_title.trim(),
+      prompt_version?.trim() || '',
+      prompt_text.trim(),
+      response_summary?.trim() || '',
+      category?.trim() || '',
       usefulness || '',
-      reviewed ? 1 : 0,
-      improved ? 1 : 0,
+      Number(reviewed) ? 1 : 0,
+      Number(improved) ? 1 : 0,
       screenshot_url || '',
-      notes || '',
+      notes?.trim() || '',
       req.params.id,
       req.user.userId
     );
@@ -153,7 +169,8 @@ app.put('/api/capsules/:id', requireAuth, (req, res) => {
 
     res.json(updated);
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error(err);
+    res.status(500).json({ error: 'Could not update prompt record' });
   }
 });
 
@@ -168,15 +185,43 @@ app.delete('/api/capsules/:id', requireAuth, (req, res) => {
       return res.status(404).json({ error: 'Capsule not found' });
     }
 
-    res.status(200).json({
+    res.json({
       deleted: true,
-      id: Number(req.params.id),
+      id: Number(req.params.id)
     });
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error(err);
+    res.status(500).json({ error: 'Could not delete prompt record' });
   }
 });
 
+// REACT PRODUCTION BUILD
+if (production) {
+  const frontendDist = path.resolve(
+    __dirname,
+    process.env.FRONTEND_DIST || '../frontend/dist'
+  );
+
+  if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+
+    app.get('/{*splat}', (req, res) => {
+      if (
+        req.path.startsWith('/api/') ||
+        req.path.startsWith('/auth/') ||
+        req.path === '/login' ||
+        req.path === '/logout'
+      ) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+  } else {
+    console.warn(`Frontend build not found: ${frontendDist}`);
+  }
+}
+
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

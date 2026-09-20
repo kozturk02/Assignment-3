@@ -1,8 +1,9 @@
 function HistoryPanel({ capsules, handleDelete, handleEdit }) {
-
   function formatDate(date) {
     return date ? new Date(date).toLocaleDateString('en-AU', {
-      day: 'numeric', month: 'long', year: 'numeric'
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     }) : '';
   }
 
@@ -39,7 +40,6 @@ function HistoryPanel({ capsules, handleDelete, handleEdit }) {
 
         return (
           <div className="capsule" key={capsule.id}>
-
             <div className="capsule-main">
               <div className="capsule-left">
                 <div className="capsule-heading">
@@ -85,11 +85,11 @@ function HistoryPanel({ capsules, handleDelete, handleEdit }) {
                   <span className="capsule-label">Screenshots</span>
 
                   {screenshots.length ? screenshots.map((screenshot, index) =>
-                    <p key={index}>
+                    <p key={`${screenshot}-${index}`}>
                       <a href={screenshot} target="_blank" rel="noreferrer">Screenshot {index + 1}</a>
                     </p>
                   ) : (
-                    <p>No additional screenshots provided.</p>
+                    <p>No screenshot evidence provided.</p>
                   )}
                 </div>
               </div>
@@ -103,7 +103,6 @@ function HistoryPanel({ capsules, handleDelete, handleEdit }) {
                 <button className="delete-button" onClick={() => handleDelete(capsule.id)}>Delete</button>
               </div>
             </div>
-
           </div>
         );
       })}

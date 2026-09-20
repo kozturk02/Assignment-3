@@ -1,7 +1,27 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { FRONTEND_URL, GITHUB_CALLBACK, CROSS_SITE, production } = require('./config');
 
 const router = express.Router();
+
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: production || CROSS_SITE,
+    sameSite: CROSS_SITE ? 'none' : 'lax',
+    path: '/'
+  };
+}
+
+function validState(state, expectedState) {
+  if (!state || !expectedState) return false;
+
+  const a = Buffer.from(state);
+  const b = Buffer.from(expectedState);
+
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
 
 function requireAuth(req, res, next) {
   const token = req.cookies.token;
@@ -11,10 +31,15 @@ function requireAuth(req, res, next) {
   }
 
   try {
-    const user = jwt.verify(token, process.env.SESSION_SECRET);
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!user?.userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     req.user = user;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 }
@@ -24,20 +49,31 @@ router.get('/api/auth/me', requireAuth, (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  const url =
-    `https://github.com/login/oauth/authorize` +
-    `?client_id=${process.env.GITHUB_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(process.env.GITHUB_FALLBACK)}` +
-    `&prompt=select_account`;
+  const state = crypto.randomBytes(32).toString('hex');
 
-  res.redirect(url);
+  res.cookie('oauth_state', state, {
+    ...cookieOptions(),
+    maxAge: 10 * 60 * 1000
+  });
+
+  const params = new URLSearchParams({
+    client_id: process.env.GITHUB_CLIENT_ID,
+    redirect_uri: GITHUB_CALLBACK,
+    state,
+    prompt: 'select_account'
+  });
+
+  res.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
 });
 
 router.get('/auth/github/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  const expectedState = req.cookies.oauth_state;
 
-  if (!code) {
-    return res.redirect(`${process.env.FRONTEND_URL}/`);
+  res.clearCookie('oauth_state', cookieOptions());
+
+  if (!code || !validState(state, expectedState)) {
+    return res.redirect(`${FRONTEND_URL}/?auth=failed`);
   }
 
   try {
@@ -45,62 +81,65 @@ router.get('/auth/github/callback', async (req, res) => {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
-        redirect_uri: process.env.GITHUB_FALLBACK,
-      }),
+        redirect_uri: GITHUB_CALLBACK
+      })
     });
+
+    if (!tokenResponse.ok) {
+      throw new Error(`GitHub token request failed: ${tokenResponse.status}`);
+    }
 
     const tokenData = await tokenResponse.json();
 
-    if (!tokenData.access_token) {
-      return res.redirect(`${process.env.FRONTEND_URL}/`);
+    if (!tokenData?.access_token) {
+      throw new Error('GitHub did not return an access token');
     }
 
     const userResponse = await fetch('https://api.github.com/user', {
       headers: {
         Authorization: `Bearer ${tokenData.access_token}`,
+        Accept: 'application/vnd.github+json',
         'User-Agent': 'AI-Capsule',
-      },
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
     });
+
+    if (!userResponse.ok) {
+      throw new Error(`GitHub user request failed: ${userResponse.status}`);
+    }
 
     const githubUser = await userResponse.json();
 
-    const token = jwt.sign(
-      {
-        userId: String(githubUser.id),
-        username: githubUser.login,
-        avatarUrl: githubUser.avatar_url,
-      },
-      process.env.SESSION_SECRET,
-      { expiresIn: '2h' }
-    );
+    if (!githubUser?.id || !githubUser?.login) {
+      throw new Error('GitHub user data is invalid');
+    }
+
+    const token = jwt.sign({
+      userId: String(githubUser.id),
+      username: githubUser.login,
+      avatarUrl: githubUser.avatar_url || null
+    }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 2 * 60 * 60 * 1000,
+      ...cookieOptions(),
+      maxAge: 2 * 60 * 60 * 1000
     });
 
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    res.redirect(`${FRONTEND_URL}/dashboard`);
   } catch (err) {
-    console.error(err);
-    res.redirect(`${process.env.FRONTEND_URL}/`);
+    console.error('OAuth error:', err.message);
+    res.redirect(`${FRONTEND_URL}/?auth=failed`);
   }
 });
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-  });
-
+  res.clearCookie('token', cookieOptions());
   res.json({ loggedOut: true });
 });
 

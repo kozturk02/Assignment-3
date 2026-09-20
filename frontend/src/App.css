@@ -532,3 +532,19 @@ main {
   width: 22px;
   height: 22px;
 }
+
+.error-message,
+.form-error {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #f7f7f7;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.form-error {
+  margin-top: 12px;
+  margin-bottom: 18px;
+}
