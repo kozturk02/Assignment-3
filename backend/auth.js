@@ -123,25 +123,22 @@ router.get('/auth/github/callback', async (req, res) => {
       throw new Error('GitHub user data is invalid');
     }
 
+    let primaryEmail = githubUser.email || '';
+
     const emailResponse = await fetch('https://api.github.com/user/emails', {
       headers: githubHeaders
     });
 
-    if (!emailResponse.ok) {
-      throw new Error(`GitHub email request failed: ${emailResponse.status}`);
+    if (emailResponse.ok) {
+      const emails = await emailResponse.json();
+
+      if (Array.isArray(emails)) {
+        primaryEmail =
+          emails.find(email => email.primary && email.verified)?.email ||
+          emails.find(email => email.verified)?.email ||
+          primaryEmail;
+      }
     }
-
-    const emails = await emailResponse.json();
-
-    if (!Array.isArray(emails)) {
-      throw new Error('GitHub email data is invalid');
-    }
-
-    const primaryEmail =
-      emails.find(email => email.primary && email.verified)?.email ||
-      emails.find(email => email.verified)?.email ||
-      githubUser.email ||
-      '';
 
     const token = jwt.sign({
       userId: String(githubUser.id),
